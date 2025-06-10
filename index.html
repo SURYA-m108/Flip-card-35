@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flip card Game</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
+      background-size: 600% 600%;
+      animation: backgroundScroll 20s ease infinite;
+      color: white;
+      flex-direction: column;
+    }
+    @keyframes backgroundScroll {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .overlay h1 {
+      font-size: 36px;
+      color: #00f7ff;
+      text-shadow: 2px 2px 5px #000;
+      animation: glow 2s ease-in-out infinite alternate;
+      margin-bottom: 10px;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #0ff, 0 0 20px #0ff; }
+      to { text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+    }
+    .info-bar {
+      font-size: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 10px;
+      flex-wrap: wrap;
+    }
+    .info-bar span {
+      padding: 6px 12px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      box-shadow: 0 0 12px #0ff;
+      animation: pulse 1.5s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+    .controls {
+      margin-bottom: 10px;
+    }
+    .controls button {
+      padding: 8px 16px;
+      font-size: 16px;
+      margin: 4px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #2196f3;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+    .controls button:hover {
+      background-color: #1e88e5;
+      transform: scale(1.05);
+    }
+    .game-container {
+      display: grid;
+      gap: 10px;
+      justify-content: center;
+      padding: 10px;
+      max-width: 90vw;
+    }
+    .card {
+      width: 60px;
+      height: 80px;
+      background-color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0ff;
+      transition: transform 0.4s ease, background-color 0.3s ease;
+      user-select: none;
+    }
+    .flipped {
+      background-color: #e91e63;
+      transform: rotateY(180deg);
+      box-shadow: 0 0 15px #ff0;
+    }
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+      display: none;
+    }
+    .popup.show { display: flex; }
+    .popup h2 {
+      margin: 10px;
+      font-size: 28px;
+      color: #fff;
+      text-shadow: 0 0 10px #4caf50;
+    }
+    .popup button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #4caf50;
+      transition: transform 0.2s ease;
+    }
+    .popup button:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <h1>Flip card Game</h1>
+    <div class="info-bar">
+      <span id="level">Level: 1</span>
+      <span id="timer">Time: 0s</span>
+      <span id="best">Best: 0s</span>
+    </div>
+    <div class="controls">
+      <button onclick="pauseGame()">⏸ Pause</button>
+      <button onclick="resumeGame()">▶️ Resume</button>
+    </div>
+  </div>
+  <div class="game-container"></div>
+  <div class="popup" id="popup">
+    <h2>You Win!</h2>
+    <button onclick="nextLevel()">Next Level</button>
+  </div>
+  <script>
+    const allEmojis = [..."🍎🍌🍇🍒🍉🍊🍍🥭🥝🍓🫐🍑🥥🍈🥬🥕🌽🥦🍆🥒🥔🧄🧅🍄🌶️🥜🌰🍞🥐🥯🥖🥨🧀🍖🍗🥩🍔🍟🍕🌭🥪🌮🌯🥙🧆🍳🥘🥗🍲🍛🍜🍝🍠🍢🍣🍤🍥🥮🍡🍦🍧🍨🍩🍪🎂🍰🧁🥧🍫🍬🍭🍮🍯🍵☕🧃🥤🧋🧊🍶🍺🍻🥂🍷🥃🍸🍹🍾🌸🌼🌻🌺🌹🥀🌷🌱🌿☘️🍀🌾🍁🍂🍃🪴🌵🎄🌲🌳🌴"];
+
+    const container = document.querySelector('.game-container');
+    const popup = document.getElementById('popup');
+    const levelDisplay = document.getElementById('level');
+    const timerDisplay = document.getElementById('timer');
+    const bestDisplay = document.getElementById('best');
+
+    let firstCard = null, secondCard = null;
+    let lockBoard = false;
+    let level = 1, timer = 0, interval = null;
+    let bestTime = localStorage.getItem('bestTime') || 0;
+    let gamePaused = false;
+
+    bestDisplay.textContent = `Best: ${bestTime}s`;
+
+    function startTimer() {
+      clearInterval(interval);
+      interval = setInterval(() => {
+        timer++;
+        timerDisplay.textContent = `Time: ${timer}s`;
+      }, 1000);
+    }
+
+    function pauseGame() {
+      clearInterval(interval);
+      interval = null;
+      gamePaused = true;
+    }
+
+    function resumeGame() {
+      if (!interval) {
+        gamePaused = false;
+        startTimer();
+      }
+    }
+
+    function generateBoard() {
+      container.innerHTML = '';
+      levelDisplay.textContent = `Level: ${level}`;
+      let numPairs = Math.min(4 + level, Math.floor(allEmojis.length / 2));
+      let emojis = allEmojis.slice(0, numPairs);
+      let cards = [...emojis, ...emojis];
+      cards.sort(() => Math.random() - 0.5);
+
+      container.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(cards.length))}, 1fr)`;
+
+      cards.forEach(symbol => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.textContent = '?';
+        card.dataset.symbol = symbol;
+        card.addEventListener('click', () => handleCardClick(card));
+        container.appendChild(card);
+      });
+
+      timer = 0;
+      timerDisplay.textContent = `Time: ${timer}s`;
+      gamePaused = false;
+      startTimer();
+    }
+
+    function handleCardClick(card) {
+      if (lockBoard || card.classList.contains('flipped') || gamePaused) return;
+
+      card.classList.add('flipped');
+      card.textContent = card.dataset.symbol;
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      lockBoard = true;
+
+      setTimeout(() => {
+        if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+          checkWin();
+        } else {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          firstCard.textContent = '?';
+          secondCard.textContent = '?';
+        }
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+      }, 800);
+    }
+
+    function checkWin() {
+      const allFlipped = document.querySelectorAll('.card.flipped');
+      if (allFlipped.length === container.children.length) {
+        clearInterval(interval);
+        if (!bestTime || timer < bestTime) {
+          bestTime = timer;
+          localStorage.setItem('bestTime', bestTime);
+          bestDisplay.textContent = `Best: ${bestTime}s`;
+        }
+        popup.classList.add('show');
+      }
+    }
+
+    function nextLevel() {
+      level++;
+      popup.classList.remove('show');
+      generateBoard();
+    }
+
+    generateBoard();
+  </script>
+</body>
+</html>
